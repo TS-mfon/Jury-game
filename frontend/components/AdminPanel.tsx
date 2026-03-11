@@ -8,6 +8,7 @@ import {
   useResolveQuestion,
   useAdvanceQuestion,
   useEndGame,
+  useResetGame,
   useGameState,
   useAllQuestions,
   usePlayerCount,
@@ -35,6 +36,7 @@ export function AdminPanel() {
   const resolveQuestion = useResolveQuestion();
   const advanceQuestion = useAdvanceQuestion();
   const endGame = useEndGame();
+  const resetGame = useResetGame();
 
   const handleAddQuestion = (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,6 +116,15 @@ export function AdminPanel() {
               disabled={endGame.isPending}
             >
               {endGame.isPending ? "Ending..." : "🛑 End Game"}
+            </button>
+          )}
+          {state === "finished" && (
+            <button
+              className="btn-primary btn-lg"
+              onClick={() => resetGame.mutate()}
+              disabled={resetGame.isPending}
+            >
+              {resetGame.isPending ? "Resetting..." : "🔄 Start Fresh Game"}
             </button>
           )}
         </div>

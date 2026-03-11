@@ -176,6 +176,31 @@ Do not include any text outside the JSON."""
     def end_game(self) -> None:
         self.game_state = "finished"
 
+    @gl.public.write
+    def reset_game(self) -> None:
+        # Reset game to lobby, clear questions, and reset scores
+        self.game_state = "lobby"
+
+        # Clear maps based on known indexes
+        for i in range(int(self.total_questions)):
+            q_key = str(i)
+            if q_key in self.resolved:
+                del self.resolved[q_key]
+            if q_key in self.answers:
+                del self.answers[q_key]
+
+        # Clear questions array
+        while len(self.questions) > 0:
+            self.questions.pop()
+
+        # Reset scores and streaks for all registered players
+        for username, _ in self.players.items():
+            self.player_scores[username] = u256(0)
+            self.player_streaks[username] = u256(0)
+
+        self.total_questions = u256(0)
+        self.current_question_index = u256(0)
+
     # ─── Player: Submit Answer ───────────────────────────────────────
 
     @gl.public.write

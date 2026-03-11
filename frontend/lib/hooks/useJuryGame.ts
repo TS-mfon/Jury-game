@@ -408,3 +408,30 @@ export function useEndGame() {
     },
   });
 }
+
+export function useResetGame() {
+  const contract = useJuryGameContract();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      if (!contract) throw new Error("Contract not configured");
+      return contract.resetGame();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["gameState"] });
+      queryClient.invalidateQueries({ queryKey: ["allQuestions"] });
+      queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
+      queryClient.invalidateQueries({ queryKey: ["currentQuestion"] });
+      queryClient.invalidateQueries({ queryKey: ["questionResults"] });
+      success("Game Reset!", {
+        description: "A fresh game has started in the lobby.",
+      });
+    },
+    onError: (err: any) => {
+      error("Failed to reset game", {
+        description: err?.message || "Please try again.",
+      });
+    },
+  });
+}

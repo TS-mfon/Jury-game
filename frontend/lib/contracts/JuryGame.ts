@@ -403,6 +403,29 @@ class JuryGame {
       throw new Error("Failed to end game");
     }
   }
+
+  async resetGame(): Promise<TransactionReceipt> {
+    try {
+      const txHash = await this.client.writeContract({
+        address: this.contractAddress,
+        functionName: "reset_game",
+        args: [],
+        value: BigInt(0),
+      });
+
+      const receipt = await this.client.waitForTransactionReceipt({
+        hash: txHash,
+        status: "ACCEPTED" as any,
+        retries: 30,
+        interval: 5000,
+      });
+
+      return receipt as TransactionReceipt;
+    } catch (error) {
+      console.error("Error resetting game:", error);
+      throw new Error("Failed to reset game");
+    }
+  }
 }
 
 export default JuryGame;

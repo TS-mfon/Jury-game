@@ -4,7 +4,6 @@ import {
   TransactionHash,
   TransactionStatus,
   GenLayerClient,
-  GenLayerChain,
 } from "genlayer-js/types";
 import { localnet } from "genlayer-js/chains";
 
@@ -37,7 +36,7 @@ export default async function main(client: GenLayerClient<any>) {
     }
 
     const deployedContractAddress =
-      (client.chain as GenLayerChain).id === localnet.id
+      (client.chain as any).id === localnet.id
         ? receipt.data.contract_address
         : (receipt.txDataDecoded as any)?.contractAddress;
 

@@ -47,7 +47,6 @@ class JuryGame(gl.Contract):
     resolved: TreeMap[str, str]
 
     def __init__(self):
-        self.admin = gl.message.sender_address
         self.game_state = "lobby"
         self.current_question_index = u256(0)
         self.total_questions = u256(0)

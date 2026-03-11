@@ -1,13 +1,8 @@
 import { readFileSync } from "fs";
 import path from "path";
-import {
-  TransactionHash,
-  TransactionStatus,
-  GenLayerClient,
-} from "genlayer-js/types";
 import { localnet } from "genlayer-js/chains";
 
-export default async function main(client: GenLayerClient<any>) {
+export default async function main(client: any) {
   const filePath = path.resolve(process.cwd(), "contracts/jury_game.py");
 
   try {
@@ -21,8 +16,8 @@ export default async function main(client: GenLayerClient<any>) {
     });
 
     const receipt = await client.waitForTransactionReceipt({
-      hash: deployTransaction as TransactionHash,
-      status: TransactionStatus.ACCEPTED,
+      hash: deployTransaction,
+      status: 5, // Status 5 is ACCEPTED in some versions, or we could pass "ACCEPTED" as any
       retries: 200,
     });
 

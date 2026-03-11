@@ -45,6 +45,28 @@ class JuryGame {
     this.client = createClient(config);
   }
 
+  // Helper to deep convert Maps to Objects and BigInts to Numbers
+  private formatResponse(data: any): any {
+    if (data === null || data === undefined) return data;
+    if (typeof data === "bigint") return Number(data);
+    if (Array.isArray(data)) return data.map(item => this.formatResponse(item));
+    if (data instanceof Map) {
+      const obj: any = {};
+      for (const [key, value] of data.entries()) {
+        obj[key] = this.formatResponse(value);
+      }
+      return obj;
+    }
+    if (typeof data === "object") {
+      const obj: any = {};
+      for (const key in data) {
+        obj[key] = this.formatResponse(data[key]);
+      }
+      return obj;
+    }
+    return data;
+  }
+
   // ─── Read Methods ──────────────────────────────────────────────
 
   async getGameState(): Promise<GameState> {
@@ -55,10 +77,7 @@ class JuryGame {
         args: [],
       });
 
-      if (result instanceof Map) {
-        return Object.fromEntries(result) as GameState;
-      }
-      return result as GameState;
+      return this.formatResponse(result) as GameState;
     } catch (error) {
       console.error("Error fetching game state:", error);
       throw new Error("Failed to fetch game state");
@@ -86,10 +105,7 @@ class JuryGame {
         functionName: "get_players",
         args: [],
       });
-      if (result instanceof Map) {
-        return Object.fromEntries(result);
-      }
-      return result || {};
+      return this.formatResponse(result) || {};
     } catch (error) {
       console.error("Error fetching players:", error);
       return {};
@@ -104,11 +120,8 @@ class JuryGame {
         args: [String(index)],
       });
 
-      if (result instanceof Map) {
-        const obj = Object.fromEntries(result) as any;
-        return { ...obj, index } as Question;
-      }
-      return { ...result, index } as Question;
+      const formatted = this.formatResponse(result);
+      return { ...formatted, index } as Question;
     } catch (error) {
       console.error("Error fetching question:", error);
       throw new Error("Failed to fetch question");
@@ -123,15 +136,7 @@ class JuryGame {
         args: [],
       });
 
-      if (Array.isArray(result)) {
-        return result.map((item: any) => {
-          if (item instanceof Map) {
-            return Object.fromEntries(item) as Question;
-          }
-          return item as Question;
-        });
-      }
-      return [];
+      return this.formatResponse(result) || [];
     } catch (error) {
       console.error("Error fetching all questions:", error);
       return [];
@@ -146,15 +151,7 @@ class JuryGame {
         args: [],
       });
 
-      if (Array.isArray(result)) {
-        return result.map((item: any) => {
-          if (item instanceof Map) {
-            return Object.fromEntries(item) as LeaderboardEntry;
-          }
-          return item as LeaderboardEntry;
-        });
-      }
-      return [];
+      return this.formatResponse(result) || [];
     } catch (error) {
       console.error("Error fetching leaderboard:", error);
       return [];
@@ -169,14 +166,7 @@ class JuryGame {
         args: [String(questionIndex)],
       });
 
-      if (result instanceof Map) {
-        const obj: any = Object.fromEntries(result);
-        if (obj.votes instanceof Map) {
-          obj.votes = Object.fromEntries(obj.votes);
-        }
-        return obj as QuestionResults;
-      }
-      return result as QuestionResults;
+      return this.formatResponse(result) as QuestionResults;
     } catch (error) {
       console.error("Error fetching question results:", error);
       return { resolved: false };

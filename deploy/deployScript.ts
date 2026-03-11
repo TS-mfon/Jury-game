@@ -4,13 +4,12 @@ import {
   TransactionHash,
   TransactionStatus,
   GenLayerClient,
-  DecodedDeployData,
   GenLayerChain,
 } from "genlayer-js/types";
 import { localnet } from "genlayer-js/chains";
 
 export default async function main(client: GenLayerClient<any>) {
-  const filePath = path.resolve(process.cwd(), "contracts/football_bets.py");
+  const filePath = path.resolve(process.cwd(), "contracts/jury_game.py");
 
   try {
     const contractCode = new Uint8Array(readFileSync(filePath));
@@ -40,7 +39,7 @@ export default async function main(client: GenLayerClient<any>) {
     const deployedContractAddress =
       (client.chain as GenLayerChain).id === localnet.id
         ? receipt.data.contract_address
-        : (receipt.txDataDecoded as DecodedDeployData)?.contractAddress;
+        : (receipt.txDataDecoded as any)?.contractAddress;
 
     console.log(`Contract deployed at address: ${deployedContractAddress}`);
   } catch (error) {
